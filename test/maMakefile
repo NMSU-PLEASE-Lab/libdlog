@@ -1,0 +1,17 @@
+# libdlog testing
+
+# all
+all: libdlog
+
+# executable
+libdlog: libdlogtest.o
+	gcc -o testlibdlog /home/grad1/maturban/rawork/myopenssh/openssh59p1/libdlog.o /home/grad1/maturban/rawork/myopenssh/openssh59p1/md5c.o libdlogtest.o -lpthread
+
+libdlogtest.o: libdlogtest.c 
+	gcc -c libdlogtest.c -I/home/grad1/maturban/rawork/myopenssh/openssh59p1/ 
+
+
+# clean up
+clean:
+	rm -rf *.o
+

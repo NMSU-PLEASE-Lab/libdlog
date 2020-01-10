@@ -1,0 +1,11 @@
+#set title "Transferred Files, Size"
+set style data linespoints
+#set key left
+#set size ratio 1.25
+set ylabel "Number in Bucket Range"
+set xlabel "File Size, bytes"
+#set term postscript eps color blacktext solid
+set term postscript eps 
+set output "size.ps"
+plot 'size.data' with linespoints
+quit

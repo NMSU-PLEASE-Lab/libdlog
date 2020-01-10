@@ -1,0 +1,11 @@
+
+- Add dlog prefix to API function names                                DONE!!!
+- code needs to be very very clean and profession                      DONE!!!
+- use doxygen-style comments to be able to generate documentation
+- C formatting, indentation, etc. (NO TABS ALLOWED!)                   DONE!!!
+- indent either 3 or 4 space per level. Not 8                          DONE!!!
+- Make code and documentation (including comments) professional        DONE!!!
+- application should only need to include libdlog.h to work            DONE!!!  ???
+  (other than maybe their own computation of the data needed to
+   pass to library calls)
+

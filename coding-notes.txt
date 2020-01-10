@@ -1,0 +1,65 @@
+
+Lots of variable names with abbreviations where the abbreviations only
+save you a couple of letters -- a very poor choice to make; if abbreviations
+are readable and save many letters, then OK, but choosing "targPath" over
+"targetPath" makes no sense.
+
+Your choice of fixing the first return-local-variable-reference problems is
+to allocate space but then still first put the result in a local array and
+then again copy it to your allocated space -- that's a waste of processing
+and space -- just put it in the allocated space immediately!
+
+In general, the C convention for status return values is that a return value
+of 0 is "all ok", and anything else is an error. It looks like you used 
+1 to indicate "all ok". This goes against standard C progamming practices.
+
+The code:
+   confFile = getenv("HOME");
+   strcat(confFile,"/.dlog.rc"); /* I changed the file name */
+is entirely unsafe: does getenv() return you freely available space
+so you can add more characters to the string? No!
+
+In dlogSetConfFile() you open and close the file to test if it is available,
+but then if you cannot open it later you quit anyways. So why do this twice?
+(also, at your call to this method you did not unlock the mutex before returning;
+I added the unlock)
+
+For all of your option flags you use raw integers, which makes it very hard to 
+read your code. At the least you should have used #defines to define the constants,
+but even better you should just use enumerations. This is exactly what they are for!
+
+The config file format is designed for your programming ease, NOT for user convenience
+or readability. Using integers to represent decisions is bad, you should just let the
+user have a meaningful name, or string, to use. Also, if you are going to use integers,
+0 should mean NO and 1 mean YES, not vice versa! Computer scientists almost universally
+understand 0 to mean false or no -- don't violate conventions unless it is worth it!
+Also, the names of the options seem to simply be copies of your variable names, not
+externally meaningful names for a user.
+
+Indentation of multiple if-else statements should always be:
+   if (expr1)
+   {
+      // body
+   } else if (expr2)
+   {
+      // body
+   } else if (expr3)
+   {
+      // body
+   } else
+   {
+      // body
+   }
+There is no reason to change the formatting after the first if.
+
+You had this check order:
+      if (sscanf(buf, "%s%s", buf1, buf2) < 2)
+         continue;
+      if (buf1[0] == '#')
+         continue;
+But the scan takes more processing time than the simple character check, so
+they should be reversed -- check for a comment line first and don't even scan it
+if it is a comment.
+
+
+

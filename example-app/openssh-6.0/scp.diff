@@ -1,0 +1,40 @@
+109a110,112
+> // libdlog
+> #include <libdlog.h>
+> 
+152a156,158
+> // libdlog
+> char *dlogTargetPath, *dlogTargetHostName;
+> 
+379a386,388
+>    // libdlog
+>    dlogInit("SCP");
+> 
+515a525,528
+>    {
+>       // libdlog: "targPath"=where to place the files in the remote host
+>       dlogTargetPath = (char*) malloc(strlen(targ)+2);
+>       strcpy(dlogTargetPath, targ+1);
+517c530
+< 	else {
+---
+> 	} else {
+537a551,553
+>    // libdlog
+>    dlogFinalize();
+> 
+579a596,599
+>    // libdlog
+>    dlogTargetHostName = (char*) malloc(strlen(thost)+2);
+>    strcpy(dlogTargetHostName, cleanhostname(thost));
+> 
+810a831,835
+> 
+>       // libdlog: starts logging data transfer
+>       unsigned long int transId = dlogBeginTransfer(name, stb.st_size,
+>                 userid, "localhost", dlogTargetPath, dlogTargetHostName, 1);
+> 
+831a857,859
+>       // libdlog: to finish the logging data transfer
+>       dlogEndTransfer(transId,0);
+> 

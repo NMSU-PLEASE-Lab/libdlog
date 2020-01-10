@@ -1,0 +1,82 @@
+
+Goal: develop a library that can be used by multiple file transfer tools to log
+      data about the transfers that are executed using the tools. The capability
+      should be highly configurable and customizable.
+
+Background: we demonstrated a logging capability in openssh (sftp,scp) by adding 
+customized logging capability to an openssh implementation. This demonstration 
+sparked a discussion about making the capability more generic and customizable,
+and being able to use it in other tools. Thus the idea of a data logging library
+was born.
+
+Capability: Information about each file transfer should be recorded. General 
+information includes source and destination IP addresses, timestamp of transfer,
+user requesting the transfer, duration of transfer, amount of bytes transferred, 
+filename of file being transferred, type of file (extension), other file 
+attributes (owner, mtime, etc.), and others. Note that many of these might be
+sensitive data, and so a data sanitization mechanism, such as an MD5 hash of the
+real information, must be supported. For example, instead of recording the 
+actual filename, we would record only the MD5 hash of the file name; this still
+gives a unique handle for the file, but does not reveal or record its name.
+
+Configurability: The library behavior must be configurable. This would likely be
+in the manner of reading in a configuration file and/or possibly inspecting 
+environment variables. Both system-wide and individual configuration files should
+be supported (e.g., enable system admins to specify a configuration, but also allow 
+user customization).
+
+----------------------------------
+
+Logging Capability
+
+A logging facility must put its data somewhere; our library should support at
+least two capabilities: either log the data to some local file (customizable),
+or log it using the "syslog" capability, which is now standard on many systems.
+See http://en.wikipedia.org/wiki/Syslog and many other resources. The syslog
+mechanism will also need to be customizable.
+
+----------------------------------
+
+Logging Data Fields
+
+These are not in any particular order, with configuration options that should be supported:
+
+- base filename without any directory paths: yes/no/md5
+- directory without base filename: yes/no/md5
+- file extension: no/(regexp?)
+- file size
+- file type? (magic number? extension?)
+- transfer duration
+- time/date stamp
+- user id (uid): yes/no/md5
+- source IP: yes/no/bitmask (mask out unwanted bits of IP address, then record)
+- destination IP: yes/no/bitmask
+- transfer success/failure: 
+  - for this and other fields, must distinguish between not-willing-to-say and 
+    not-able-to-provide
+
+Issue: getting the IP addresses is not necessarily easy. Should the data transfer
+program give the socket descriptor to the library? That is potentially dangerous.
+But requiring the program to get the IP address can mean extensive modifications.
+Maybe we can provide an easy "getIPAdress(descriptor)" API that wraps all the 
+complexity but does not pass the descriptor to the rest of the library.
+
+-----------------------------------
+
+API Ideas:
+
+- Init() - need an init function to read config files, etc.
+- Finalize() - finish everything off
+- beginTransfer() - begin a file transfer
+- endTransfer() - end a transfer
+  - note that there may be parallelism (threading) and so the begin and end transfers
+    must be able to relate to each other; a typical manner is that the begin returns
+    a handle (an integer) that unique identifies it, and the end must pass that handle
+    back to the library
+
+unsigned int dlogInit(...)
+unsigned int dlogFinalize(...)
+unsigned int dlogBeginTransfer (many data field args that are known before xfer)
+unsigned int dlogEndTransfer(unsigned int transferID, more field args...)
+maybe more functions as needed.
+

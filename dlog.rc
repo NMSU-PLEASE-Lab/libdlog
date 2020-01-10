@@ -1,0 +1,71 @@
+#
+# DLOG Example Configuration File: 
+#
+
+# To log or not (yes/no, default yes)
+DoLogging = yes
+
+# Logging data location, either to a file or to syslog 
+# (file/syslog, default file)
+LoggingLocation = file
+
+# Log file name, used if logging to file (complete path, default 
+# /var/log/datalog.log)
+LogFilename = ./dlogxfer.log
+
+# Number of records to save in memory before writing to file or
+# syslog. Default is 5, max 255. Higher will save on log I/O overhead.
+LogBatchSize = 10
+
+#-- Syslog options are used if logging to syslog --
+
+# If syslog logging, specify the facility to use, either LOG_FAC or a
+# number, FAC is one of (AUTH,AUTHPRIV,CRON,DAEMON,FTP,KERN,LOCAL[0-7],
+# LPR,MAIL,NEWS,SYSLOG,USER,UUCP). Default is LOG_USER.
+LogFacility = LOG_USER
+
+# If syslog logging, specify the ident to use for openlog().
+# Defaults to "DLOG".
+LogIdent = DLOGT
+
+# If syslog logging, specify level to use, as a number 0-7 or as
+# LOG_LEV, where LEV is one of (EMERG,ALERT,ERR,WARNING,NOTICE,INFO,
+# DEBUG). Default is LOG_INFO.
+LogLevel = LOG_INFO
+
+# If syslog logging, speficy a number 1-63 or an OR'd set of LOG_OPTs,
+# where OPT is one of (CONS,NDELAY,NOWAIT,ODELAY,PERROR,PID). 
+# default is LOG_PID. Or'ing is done with '|'. No spaces.
+LogOption = LOG_PID
+
+#
+# Logging data field options: can control which data fields are logged and 
+# in what format
+# - option 'md5' means an md5 hash of the original data, which can be used 
+#   to capture a unique identifier without revealing the original data
+#
+
+# Transferred base file name, no path (yes/no/md5, default yes)
+LogSourcename = no
+# Transferred file extension (yes/no/md5, default yes)
+LogExtension = no
+# Source path of file (yes/no/md5, default yes)
+LogSourcePath = no
+# Target path of file (yes/no/md5, default yes)
+LogTargetPath = no
+# User ID (yes/no/md5, default yes)
+LogUserID = yes
+
+# Source and target IP address or hostname logging
+# (yes/no/raw/<bitmask>, default yes)
+# - 'no' means no logging
+# - 'raw' means accept the application's host strings as they are
+# - 'yes' means convert to IP string if necessary, no bitmask
+#   (recommend NOT using 'yes', since it can trigger a name lookup)
+# - 'bitmask' means the given dotted decimal netmask will be applied
+#   (e.g., 255.255.255.0 means mask out the lower 8 bits)
+LogSourceIP = raw
+LogTargetIP = 0.0.255.255
+
+# -- Q: Do we need to support IPv6 addresses?
+

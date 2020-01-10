@@ -1,0 +1,15 @@
+# doxyconfig
+# Documentation with Doxygen
+
+PROJECT_NAME           = "Logging DATA Library"
+PROJECT_NUMBER         = "Version 0.9b"
+INPUT                  = publicapi.c private.c
+TAB_SIZE               = 3
+JAVADOC_AUTOBRIEF      = YES
+EXTRACT_ALL            = YES
+BUILTIN_STL_SUPPORT    = YES
+WARNINGS               = YES
+GENERATE_LATEX         = YES
+SORT_MEMBER_DOCS       = NO
+REPEAT_BRIEF           = YES
+EXTRACT_STATIC         = YES

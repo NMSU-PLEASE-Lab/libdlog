@@ -1,0 +1,73 @@
+
+Libdlog: a logging library for data transfer applications
+- provides a basic API for logging individual data (file)
+  transfers within a data transfer application
+- logging information can be customized
+- logging location can be a logfile or syslog
+- identity-containing data fields (e.g., username, filename)
+  can be hashed using MD5 to preserve uniqueness but hide identity
+
+Building and installing libdlog
+-------------------------------
+
+Libdlog uses the standard autoconf tools "configure" script. There are no
+libdlog-specific configure options, only the generic options. The most
+useful is "--prefix=/install/path" which will allow you to override the
+default installation path of /usr/local.
+
+After configuring, "make" will build the library and a test program
+in the "test" directory. If you want to run the test program BEFORE
+you do "make install", you will probably need to set your 
+LD_LIBRARY_PATH environment variable to the "libdlog/src/.libs" 
+hidden directory (hidden because of the leading dot in its name).
+
+Otherwise, "make install" will install the library and header files
+(and currently the dlogtest program unfortunately) into the install
+location. 
+
+The test program dlogtest does not actually transfer any data, but
+just invokes the logging routines using multiple threads and generates
+a logfile that can be inspected for errors. 
+
+Testing libdlog on a real program: openssh
+------------------------------------------
+
+Included in this distribution is a directory "openssh-6.0". This
+contains patch information for two files in the openssh-6.0 
+source distribution: the Makefile and the source for the "scp"
+(secure copy) command, the file scp.c. There are also ".diff" files
+for each that show the raw diff output rather than the patch format
+output.
+
+For the Makefile, it would be best to use either the patch or diff
+file and make the changes by hand: it is only two lines, and you 
+will need to change the paths for the changes to the path where you
+installed libdlog. One path is the include path for the header file
+(the CFLAGS line) and one path is the library path (the LIBS line).
+
+For the scp.c file, you should be able to apply the patch by going
+to the openssh-6.0 source directory and using the patch command like
+
+patch < /path/to/libdlog/openssh-6.0/scp.patch
+
+Once you have done these, you can rebuild the openssh scp command
+by doing a "make" and then a "make install". Now you should have
+an "scp" installed that will use libdlog and will be able to log
+data transfers.
+
+To test your new scp program:
+
+1. Copy the "xfer.conf" file in the libdlog directory to the
+filename ".dlog.rc" in your home directory.
+
+2. Edit the .dlog.rc file and change the logging location to "file",
+then uncomment and change the logging file name to a file in your
+own directory space -- whatever you want to make it.
+
+3. Now use your "scp" command to transfer a file (or more) to some
+remote machine. 
+
+4. Once the scp command is done and the transfer has been completed,
+check your log file for a logging record (there should be one for
+each file).
+

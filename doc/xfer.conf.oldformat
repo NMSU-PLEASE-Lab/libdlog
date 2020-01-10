@@ -1,0 +1,32 @@
+
+#	0:yes, a field will be recorded in logging file
+#	1:no ,
+#	2:use md5 hash function, then record
+
+fileNameFormat	0
+fileExtFormat	0
+srcPathFormat	0
+targPathFormat	0
+userIDFormat	0
+
+#	0:yes, a field will be recorded in logging file
+#	1:no ,
+#	2:"bitmask" before recording
+
+srcIPFormat	0
+targIPFormat	0
+
+#	to logging or not; 0:not logging	1:logging
+logDoLogging	1
+
+dlogFileName	/home/grad1/maturban/rawork/xtranlog/dlogxfer.log
+
+#	0: log the data to some local files specified by "logFileNameScp" and "logFileNameSftp"
+#	1: log it using the "syslog" capability
+
+sysLogFlag	0
+
+#	A netmask is used to bitmask IPs before recording into logging file;
+#	It is used if the value of either "srcIPFormat" or "targIPFormat" is 2
+
+netmaskIP	16

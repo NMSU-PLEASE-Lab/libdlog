@@ -1,0 +1,90 @@
+--- /home/dlerma/openssh-6.1p1/sftp-server.c	2011-06-19 22:42:52.000000000 -0600
++++ sftp-server.c	2012-12-10 12:58:39.000000000 -0700
+@@ -42,6 +42,9 @@
+ #include <unistd.h>
+ #include <stdarg.h>
+ 
++//libdlog DJL
++#include <libdlog.h>
++
+ #include "xmalloc.h"
+ #include "buffer.h"
+ #include "log.h"
+@@ -345,6 +348,9 @@
+ 		    emsg == NULL ? "" : emsg, emsg == NULL ? "" : " ",
+ 		    handle_to_name(handle));
+ 	}
++
++	// libdlog: to finish the logging data transfer
++//	dlogEndTransfer(transId,0);
+ }
+ 
+ static void
+@@ -550,12 +556,26 @@
+ 	char *name;
+ 	int handle, fd, flags, mode, status = SSH2_FX_FAILURE;
+ 
++	//libdlog
++	uid_t userid;
++//	unsigned long long size;
++
+ 	id = get_int();
++	
++	//libdlog
++//	handle = get_handle();
++	//size = (unsigned long long)handle_bytes_read(handle);
++
+ 	name = get_string(NULL);
+ 	pflags = get_int();		/* portable flags */
+ 	debug3("request %u: open flags %d", id, pflags);
+ 	a = get_attrib();
+ 	flags = flags_from_portable(pflags);
++
++	// libdlog: starts logging data transfer 
++	userid = getuid();
++	unsigned long int transId = dlogBeginTransfer(name, 15, userid, name, client_addr, "localhost", (strcmp(string_from_portable(pflags), "READ") == 0) ? 0 : 1);
++
+ 	mode = (a->flags & SSH2_FILEXFER_ATTR_PERMISSIONS) ? a->perm : 0666;
+ 	logit("open \"%s\" flags %s mode 0%o",
+ 	    name, string_from_portable(pflags), mode);
+@@ -578,6 +598,10 @@
+ 	}
+ 	if (status != SSH2_FX_OK)
+ 		send_status(id, status);
++
++	// libdlog: to finish the logging data transfer
++	dlogEndTransfer(transId,0);
++
+ 	xfree(name);
+ }
+ 
+@@ -1278,6 +1302,7 @@
+ 	u_int type;
+ 	u_char *cp;
+ 
++
+ 	buf_len = buffer_len(&iqueue);
+ 	if (buf_len < 5)
+ 		return;		/* Incomplete message. */
+@@ -1408,6 +1433,9 @@
+ 	extern char *optarg;
+ 	extern char *__progname;
+ 
++	// libdlog
++	dlogInit("SFTP_SERVER");
++
+ 	__progname = ssh_get_progname(argv[0]);
+ 	log_init(__progname, log_level, log_facility, log_stderr);
+ 
+@@ -1545,4 +1573,11 @@
+ 		if (buffer_check_alloc(&oqueue, SFTP_MAX_MSG_LENGTH))
+ 			process();
+ 	}
++
++//libdlog change
++//	err = interactive_loop(conn, file1, file2, host);
++
++    // libdlog
++    dlogFinalize();
++
+ }

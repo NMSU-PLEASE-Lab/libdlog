@@ -1,0 +1,8 @@
+44c44
+< CFLAGS=-g -O2 -Wall -Wpointer-arith -Wuninitialized -Wsign-compare -Wformat-security -Wno-pointer-sign -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fno-builtin-memset -fstack-protector-all -std=gnu99 
+---
+> CFLAGS=-g -O2 -Wall -Wpointer-arith -Wuninitialized -Wsign-compare -Wformat-security -Wno-pointer-sign -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fno-builtin-memset -fstack-protector-all -std=gnu99 -I../libdlog/install/include
+46c46
+< LIBS=-lresolv -lcrypto -ldl -lutil -lz -lnsl  -lcrypt
+---
+> LIBS=-lresolv -lcrypto -ldl -lutil -lz -lnsl  -lcrypt -L../libdlog/install/lib -ldlog

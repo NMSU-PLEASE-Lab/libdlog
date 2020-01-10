@@ -1,0 +1,11 @@
+#set title "File Transfer Speed"
+set style data linespoints
+#set key left
+#set size ratio 1.25
+set ylabel "Number in Bucket Range"
+set xlabel "Transfer Speed, bytes/microsecond"
+#set term postscript eps color blacktext solid
+set term postscript eps 
+set output "speed.ps"
+plot 'speed.data' with linespoints
+quit
