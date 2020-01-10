@@ -1,0 +1,67 @@
+--- orig_src/libdlog.c	2012-05-30 16:11:33.000000000 -0600
++++ libdlog.c	2012-06-28 13:36:46.000000000 -0600
+@@ -29,6 +29,9 @@
+ #include <sys/types.h>
+ #include <libdlog.h>
+ 
++//libdlog 06/2012
++#include <unistd.h>
++
+ #define dlogMAXLOGTOFILE           1500
+ #define dlogMAXFILEPATH            300
+ #define dlogMAXIP                  100
+@@ -567,6 +570,9 @@
+    char *srcBitmaskIP=0;
+    char *targBitmaskIP=0;
+ 
++   //libdlog 06/2012
++   char *trgPath;
++
+    char userID[30]; 
+    char sourceIP[dlogMAXIP];
+    char targetIP[dlogMAXIP];
+@@ -652,6 +658,26 @@
+    fileName = dlogGetFileName(filename);
+    filePath = dlogGetFilePath(filename);
+    fileExt = dlogGetFileExt(fileName);
++   trgPath = dlogGetFilePath(targetPath2);		//libdlog 06/2012
++
++//libdlog 06/2012--------------------------------------------
++//Check if sourceDrc is empty & if so changes it's path to the current working directory
++
++	if(filePath == NULL)
++	{
++		filePath = (char *) malloc(dlogMAXFILEPATH * sizeof (char));
++		getcwd(filePath, dlogMAXFILEPATH * sizeof (char));
++	}
++		
++//Check if targetDrc is empty & if so changes it's path to the current working directory
++
++	if(trgPath == NULL)
++	{
++		trgPath = (char *) malloc(dlogMAXFILEPATH * sizeof (char));
++		getcwd(trgPath, dlogMAXFILEPATH * sizeof (char));
++	}
++
++//------------------------------------------------------------
+ 
+    /* Now is time of file transfer start */
+    gettimeofday(&logStartTval,0);
+@@ -674,7 +700,7 @@
+    if (userIDFormat == M_MD5)
+       strcpy(userIDMD5,logMD5(userID));
+    if (targetPathFormat == M_MD5)
+-      strcpy(targetPathMD5,logMD5(targetPath2));
++      strcpy(targetPathMD5,logMD5(trgPath));		//libdlog change 06/2012
+    if (sourceIPFormat == YES)
+       srcBitmaskIP = dlogBitmask(sourceIP,sourceIPMask);
+    if (targetIPFormat == YES)
+@@ -695,7 +721,7 @@
+                      fileExt == NULL ? "" : fileExt,
+             (userIDFormat != M_YES) ? ((userIDFormat == M_MD5) ? userIDMD5 : "") : userID,
+             logStartTval.tv_sec, 
+-            (targetPathFormat != M_YES) ? ((targetPathFormat == M_MD5) ? targetPathMD5 : "") : targetPath2,
++            (targetPathFormat != M_YES) ? ((targetPathFormat == M_MD5) ? targetPathMD5 : "") : trgPath,		//libdlog 06/2012
+             (sourceIPFormat != M_YES) ? (sourceIPFormat == M_MD5 ? ((srcBitmaskIP == NULL) ? "" : 
+             srcBitmaskIP) : "") : sourceIP,
+             (targetIPFormat != M_YES) ? (targetIPFormat == M_MD5 ? ((targBitmaskIP == NULL)? "" 

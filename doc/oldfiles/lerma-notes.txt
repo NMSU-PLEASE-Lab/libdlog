@@ -1,0 +1,89 @@
+-----------------------------
+Libdlog Install Results
+David Lerma
+-----------------------------
+
+
+---Building and Installing Libdlog---
+
+-Uncompressing, configuring, and compiling the program worked fine
+
+-There was some confusion when running the test program dlogtest since there was really no confirmation in the output stating that the test was successful or not, and also since I was unsure of what to look for to determine if something went wrong.  No errors messages were seen when running dlogtest and a log file was created, as stated in the readme file.  In the log, there appears to be a random character string in all of the srcDir in each log entry.  Below are some snippets of what is appearing:
+
+dlogxfer.log
+1 'TestProgram_RECEIVE' name='file1.e1' size=3659 srcDir='T:/1.-;+sd66[!:6' fileExt='e1' user=...
+7 'TestProgram_RECEIVE' name='file1.e1' size=3659 srcDir='!%hkV0|[XRw%32?1' fileExt='e1' user=...
+8 'TestProgram_RECEIVE' name='file1.e1' size=3659 srcDir='w71GK#p-9yÃ¿8<5}p' fileExt='e1' user=...
+9 'TestProgram_RECEIVE' name='file1.e1' size=3659 srcDir=')!nKCF^+W!X3;+S>' fileExt='e1' user=...
+...
+
+-Installing Libdlog worked fine (make install)
+
+---Testing libdlog on a real program: openssh---
+
+-When opening the Makefile.patch to make changes to the two paths, it was evident that CPPFLAGS was also going to have to be edited.  Because it was a line that was not going to be changed by the patch, I simply copied that line from the original Makefile to the .patch file.  Changes were then made to the two paths as stated in the Readme.
+
+-The first attempt of patching the Makefile failed. After comparing the .patch file to the original Makefile I noticed that there were some minor difference between the two.  I am assuming this is due to the Makefile being changed when openssh was updated to 6.0p1.  
+
+Here are the changes that I made to Makefile.patch:
+	-Changed CPPFlags =â€¦  on line 9 as described above
+	-Removed  -std=gnu99 from line 7 and 8
+	-Added â€“Wno-unused-result to line 7 and 8
+	-Moved â€“lresolv from beginning to end in lines 10 and 11
+	-Changed lib and include path (As stated in Readme)
+
+Below is the orginal Makefile.patch and the revised Makefile.patch:
+
+Original Makefile.patch
+
+--- orig_src/Makefile	2012-05-19 18:22:59.000000000 -0600
++++ Makefile	2012-05-20 09:18:39.000000000 -0600
+@@ -41,9 +41,9 @@
+ 
+ CC=gcc
+ LD=gcc
+-CFLAGS=-g -O2 -Wall -Wpointer-arith -Wuninitialized -Wsign-compare -Wformat-security -Wno-pointer-sign -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fno-builtin-memset -fstack-protector-all -std=gnu99 
++CFLAGS=-g -O2 -Wall -Wpointer-arith -Wuninitialized -Wsign-compare -Wformat-security -Wno-pointer-sign -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fno-builtin-memset -fstack-protector-all -std=gnu99 -I../libdlog/install/include
+ CPPFLAGS=-I. -I$(srcdir) -I/home/jcook/tools/include  $(PATHS) -DHAVE_CONFIG_H
+-LIBS=-lresolv -lcrypto -ldl -lutil -lz -lnsl  -lcrypt
++LIBS=-lresolv -lcrypto -ldl -lutil -lz -lnsl  -lcrypt -L../libdlog/install/lib -ldlog
+ SSHLIBS=
+ SSHDLIBS=
+ LIBEDIT=
+
+
+Revised Makefile.patch
+
+--- orig_src/Makefile   2012-05-19 18:22:59.000000000 -0600
++++ Makefile    2012-05-20 09:18:39.000000000 -0600
+@@ -41,9 +41,9 @@
+ 
+ CC=gcc
+ LD=gcc
+-CFLAGS=-g -O2 -Wall -Wpointer-arith -Wuninitialized -Wsign-compare -Wformat-security -Wno-pointer-sign -Wno-unused-re
+sult -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fno-builtin-memset -fstack-protector-all 
++CFLAGS=-g -O2 -Wall -Wpointer-arith -Wuninitialized -Wsign-compare -Wformat-security -Wno-pointer-sign -Wno-unused-re
+sult -fno-strict-aliasing -D_FORTIFY_SOURCE=2 -fno-builtin-memset -fstack-protector-all -I/libdlog/install/include
+ CPPFLAGS=-I. -I$(srcdir)  $(PATHS) -DHAVE_CONFIG_H
+-LIBS=-lcrypto -ldl -lutil -lz -lnsl  -lcrypt -lresolv
++LIBS=-lcrypto -ldl -lutil -lz -lnsl  -lcrypt -lresolv -L/libdlog/install/lib -ldlog
+ SSHLIBS=
+ SSHDLIBS=
+ LIBEDIT=
+
+
+-Once all changes were made, the Makefile was patched successfully.
+
+-scp.c was patched successfully with no problems.
+
+-There was slight confusion when copying the data from xfer.conf to .dlog.rc, since I thought that .dlog.rc was a file already created, but this was not a big issue since once I realized that I had to create the file .dlog.rc.
+
+-Attempting to transfer a file using SCP initially failed stating that the shared library libdlog.so.0 did not exist.  This problem was fixed by setting my LD_LIBRARY_PATH to libdlogâ€™s lib directory.
+
+-The file transfer through SCP was successful and a .log file was created in the location I specified in the .dlog.rc, logging the information of the file transfer.
+
+-In the .log file I noticed that the srcDir is no longer a random character string, but is now null.  I changed the .dlog.rc's DoLogSourcePath from md5 to yes to see if the log entry would change at all.  With this change, srcDir is now an empty string in the log entry.  There may be a problem with recording the srcDir.  Overall, libdlog appears to be installed and running in my account. 
+
+
+
+
